@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Diyagram Üretici</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Destekli Diyagram Üretici</h1>
+            <p>Epic ve User Story metinlerini saniyeler içinde UML diyagramlarına dönüştürün.</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <label for="storyInput">Gereksinim Metni (User Story):</label>
+                <textarea id="storyInput" rows="5" placeholder="Örn: Bir müşteri olarak, sisteme giriş yapmak istiyorum..."></textarea>
+                <button id="generateBtn">Diyagramı Çiz</button>
+            </section>
+
+            <section class="output-section">
+                <h2>Üretilen Diyagram</h2>
+                <div id="diagramContainer" class="diagram-box">
+                    <p class="placeholder-text" id="statusText">Diyagram burada görüntülenecektir.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
