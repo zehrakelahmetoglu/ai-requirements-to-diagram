@@ -1,16 +1,22 @@
 print("AI-UML Backend Hazırlanıyor...")
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware # CORS için gerekli
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
+from dotenv import load_dotenv
+
+# AI servislerini içe aktarıyoruz
+from ai_service import analyze_with_ai, validate_requirement
+
+# .env dosyasındaki çevresel değişkenleri yükle (Örn: GEMINI_API_KEY)
+load_dotenv()
 
 app = FastAPI()
 
-# --- 1. CORS AYARI (Frontend ile bağlantı kurabilmek için ŞART) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # React'in (localhost:5173) sana ulaşmasına izin verir
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,50 +24,37 @@ app.add_middleware(
 
 class Requirement(BaseModel):
     text: str
-
-# --- 2. ARKADAŞININ İSTEDİĞİ FORMAT (Nodes ve Edges) ---
-def ai_analiz_motoru(metin: str):
-    # Arkadaşın "Zehra bana {nodes, edges} döndür" dediği kısım tam olarak burası.
-    # Şimdilik örnek bir yapı döndürüyoruz, ilerde buraya gerçek AI kodunu koyacaksın.
-    return {
-        "nodes": [
-            {
-                "id": "1", 
-                "type": "input", 
-                "data": {"label": "Aktör: Kullanıcı"}, 
-                "position": {"x": 250, "y": 0}
-            },
-            {
-                "id": "2", 
-                "data": {"label": f"Aksiyon: {metin}"}, 
-                "position": {"x": 250, "y": 150}
-            }
-        ],
-        "edges": [
-            {
-                "id": "e1-2", 
-                "source": "1", 
-                "target": "2", 
-                "animated": True # Çizgi hareketli olsun, güzel görünür
-            }
-        ]
-    }
+    diagramType: str = "usecase"
 
 @app.get("/")
 def read_root():
-    return {"durum": "Sistem Calisiyor - CORS ve Format Hazır!"}
+    return {"durum": "Sistem Calisiyor - Hafta 3 (Entegrasyon) Basladi - AI Bağlandı"}
 
 @app.post("/analyze")
 def analyze_text(req: Requirement):
-    print(f"Frontend'den Gelen Metin: {req.text}")
+    print(f"Frontend'den Gelen Metin: {req.text}, Tip: {req.diagramType}")
     
-    # Arkadaşının tam istediği formatta cevabı hazırlıyoruz
-    sonuc = ai_analiz_motoru(req.text)
+    # 1. KALİTE VE EPIC KONTROLÜ (GÖREV 3 & 4)
+    # Gelen metin mantıklı bir User Story mi yoksa Epic mi? Yoksa saçma bir metin mi?
+    validation = validate_requirement(req.text)
     
-    return {
-        "mesaj": "Analiz tamamlandı",
-        "analiz_sonucu": sonuc
-    }
+    # Eğer is_valid False ise veya puanı çok düşükse reddet!
+    if not validation.get("is_valid", True) or validation.get("quality_score", 10) < 5:
+        hata_mesaji = (
+            f"❌ Metin Kalite Kontrolünden Geçemedi!\n\n"
+            f"Tür: {validation.get('type')}\n"
+            f"Puan: {validation.get('quality_score')}/10\n"
+            f"Uzman Geri Bildirimi: {validation.get('feedback')}"
+        )
+        raise HTTPException(status_code=400, detail=hata_mesaji)
+        
+    # Eğer geçerli bir metinse veya Epic ise devam et (GÖREV 1, 2, 5)
+    analiz = analyze_with_ai(req.text, req.diagramType)
+    
+    # Analiz sonucuna metadata olarak AI'ın kalite raporunu da gömelim
+    analiz["metadata"] = validation
+    
+    return analiz
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
