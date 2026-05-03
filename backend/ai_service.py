@@ -66,7 +66,7 @@ def validate_requirement(text: str) -> dict:
         - "As a [role], I want to [action], so that [benefit]" yapısına benzeyen, net bir Aktör ve Aksiyon barındıran metinlere 8 ve üzeri yüksek puan ver.
         """
         
-        for model_name in ("gemini-2.5-pro", "gemini-2.5-flash"):
+        for model_name in ("gemini-1.5-pro", "gemini-1.5-flash"):
             try:
                 response = client.models.generate_content(
                     model=model_name,
