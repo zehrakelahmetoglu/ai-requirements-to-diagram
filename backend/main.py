@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware 
 from pydantic import BaseModel
 import uvicorn
+from ai_service import analyze_with_ai  # Gerçek AI motorunu içeri alıyoruz
 
 app = FastAPI()
 
@@ -52,16 +53,13 @@ def read_root():
     return {"durum": "Sistem Calisiyor - CORS ve Format Hazır!"}
 
 @app.post("/analyze")
-def analyze_text(req: Requirement):
+async def analyze_text(req: Requirement):
     print(f"Frontend'den Gelen Metin: {req.text}")
     
    
-    sonuc = ai_analiz_motoru(req.text)
+    sonuc = await analyze_with_ai(req.text)
     
-    return {
-        "mesaj": "Analiz tamamlandı",
-        "analiz_sonucu": sonuc
-    }
+    return sonuc
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
