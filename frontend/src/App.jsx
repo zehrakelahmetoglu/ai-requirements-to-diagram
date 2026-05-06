@@ -7,7 +7,7 @@
 //     FlowCanvas'ın iç setNodes'unu çağırır.
 //   - Bu sayede iki ayrı state kaynağının çakışması tamamen ortadan kalkar.
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
 import Sidebar    from './components/Sidebar';
@@ -23,13 +23,20 @@ export default function App() {
   const [error, setError]                 = useState(null);
   const [sidebarOpen, setSidebarOpen]     = useState(true);
 
-  // API sonuçları — FlowCanvas bunları "analiz yükü" olarak alır
   const [analyzedNodes, setAnalyzedNodes] = useState([]);
   const [analyzedEdges, setAnalyzedEdges] = useState([]);
 
+  // Toast bildirimi state'i
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
+
   // FlowCanvas'ın iç addNode fonksiyonuna erişmek için ref köprüsü
-  // FlowCanvas bu ref'i kendi addNode impl'i ile dolduracak
   const addNodeRef = useRef(null);
+
+  // Toast gösterme yardımcısı (3 sn sonra otomatik kaybolur)
+  const showToast = useCallback((type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
 
   // ── Analiz İsteği ───────────────────────────────────────────────────────────
   const handleAnalyze = async () => {
@@ -41,9 +48,12 @@ export default function App() {
       const { nodes: newNodes, edges: newEdges } = mapToReactFlow(backendData);
       setAnalyzedNodes(newNodes);
       setAnalyzedEdges(newEdges);
+      showToast('success', `${newNodes.length} düğüm oluşturuldu ✓`);
       if (window.innerWidth < 768) setSidebarOpen(false);
     } catch (err) {
-      setError(err.message ?? 'Bilinmeyen bir hata oluştu.');
+      const msg = err.message ?? 'Bilinmeyen bir hata oluştu.';
+      setError(msg);
+      showToast('error', msg);
     } finally {
       setLoading(false);
     }
@@ -93,6 +103,16 @@ export default function App() {
             analyzedEdges={analyzedEdges}
             addNodeRef={addNodeRef}
           />
+
+          {/* Toast bildirimi */}
+          {toast && (
+            <div className={`toast toast--${toast.type}`} role="alert">
+              <span className="toast__icon">
+                {toast.type === 'success' ? '✓' : '⚠'}
+              </span>
+              {toast.message}
+            </div>
+          )}
         </div>
       </div>
     </ReactFlowProvider>

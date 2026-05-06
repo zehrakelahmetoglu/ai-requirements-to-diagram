@@ -3,10 +3,8 @@
 // analiz butonu ve hata/loading durumları.
 
 const DIAGRAM_OPTIONS = [
-  { value: 'class',    label: '🗂️  Sınıf Diyagramı',    preview: '▭ Sınıf kutusu',     color: '#6366f1' },
-  { value: 'usecase',  label: '👤 Use Case Diyagramı',  preview: '⬭ Elips / aktör',    color: '#059669' },
-  { value: 'activity', label: '⚙️  Aktivite Diyagramı', preview: '▢ Eylem kutusu',     color: '#3b82f6' },
-  { value: 'sequence', label: '🔄 Sıralama Diyagramı',  preview: '⬜ Yaşam çizgisi',   color: '#16a34a' },
+  { value: 'class',   label: '🗂️  Sınıf Diyagramı',   preview: '▭ Sınıf kutusu',  color: '#6366f1' },
+  { value: 'usecase', label: '👤 Use Case Diyagramı', preview: '⬭ Elips / aktör', color: '#059669' },
 ];
 
 export default function Sidebar({

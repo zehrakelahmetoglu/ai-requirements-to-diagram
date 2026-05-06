@@ -19,18 +19,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import ClassNode    from './nodes/ClassNode';
-import UseCaseNode  from './nodes/UseCaseNode';
-import ActivityNode from './nodes/ActivityNode';
-import SequenceNode from './nodes/SequenceNode';
-import Toolbar      from './Toolbar';
+import ClassNode   from './nodes/ClassNode';
+import UseCaseNode from './nodes/UseCaseNode';
+import Toolbar     from './Toolbar';
 
 // nodeTypes bileşen dışında sabit — her render'da yeniden oluşmamalı
 const NODE_TYPES = {
-  customClass:    ClassNode,
-  customUseCase:  UseCaseNode,
-  customActivity: ActivityNode,
-  customSequence: SequenceNode,
+  customClass:   ClassNode,
+  customUseCase: UseCaseNode,
 };
 
 // Diyagram tipine göre yeni node şablonu döner
@@ -46,18 +42,6 @@ const NODE_TEMPLATES = {
     type: 'customUseCase',
     position: { x: 80 + Math.random() * 300, y: 80 + Math.random() * 300 },
     data: { label: 'Yeni İşlem', isActor: false },
-  }),
-  activity: (id) => ({
-    id,
-    type: 'customActivity',
-    position: { x: 80 + Math.random() * 300, y: 80 + Math.random() * 300 },
-    data: { label: 'Yeni Eylem', shape: 'activity' },
-  }),
-  sequence: (id) => ({
-    id,
-    type: 'customSequence',
-    position: { x: 80 + Math.random() * 300, y: 80 + Math.random() * 300 },
-    data: { label: 'Katılımcı' },
   }),
 };
 
@@ -111,6 +95,33 @@ export default function FlowCanvas({
   return (
     <div className="flow-canvas">
       <Toolbar onClear={handleClear} />
+
+      {/* Boş canvas rehber ekranı */}
+      {nodes.length === 0 && (
+        <div className="canvas-empty-state">
+          <div className="canvas-empty-state__icon">✦</div>
+          <h2 className="canvas-empty-state__title">Diyagram Oluşturmaya Başla</h2>
+          <p className="canvas-empty-state__desc">
+            Sol panelden gereksinim metninizi girin ve<br />
+            <strong>AI ile Analiz Et</strong> butonuna tıklayın.
+          </p>
+          <div className="canvas-empty-state__steps">
+            <div className="canvas-empty-state__step">
+              <span className="canvas-empty-state__step-num">1</span>
+              <span>Kullanıcı hikayenizi veya gereksinim metninizi yazın</span>
+            </div>
+            <div className="canvas-empty-state__step">
+              <span className="canvas-empty-state__step-num">2</span>
+              <span>Diyagram tipini seçin: <strong>Sınıf</strong> veya <strong>Use Case</strong></span>
+            </div>
+            <div className="canvas-empty-state__step">
+              <span className="canvas-empty-state__step-num">3</span>
+              <span>AI diyagramı otomatik oluşturur — düzenleyebilirsiniz</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -121,6 +132,10 @@ export default function FlowCanvas({
         fitView
         fitViewOptions={{ padding: 0.2 }}
         deleteKeyCode="Delete"
+        selectionKeyCode="Shift"
+        multiSelectionKeyCode="Shift"
+        selectNodesOnDrag={false}
+        elevateEdgesOnSelect
         minZoom={0.1}
         maxZoom={2}
       >
