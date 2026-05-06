@@ -19,8 +19,6 @@ function resolveNodeType(type = '') {
   const t = type.toLowerCase();
   if (t === 'class') return 'customClass';
   if (t === 'usecase' || t === 'actor') return 'customUseCase';
-  if (['activity', 'decision', 'start', 'end', 'fork', 'join'].includes(t)) return 'customActivity';
-  if (t === 'sequence' || t === 'lifeline') return 'customSequence';
   return 'customUseCase'; // fallback
 }
 
@@ -36,12 +34,6 @@ function buildNodeData(n) {
   }
   if (t === 'usecase' || t === 'actor') {
     return { label: n.label ?? 'İşlem', isActor: t === 'actor' };
-  }
-  if (['activity', 'decision', 'start', 'end', 'fork', 'join'].includes(t)) {
-    return { label: n.label ?? '', shape: t };
-  }
-  if (t === 'sequence' || t === 'lifeline') {
-    return { label: n.label ?? 'Katılımcı' };
   }
   return { label: n.label ?? '' };
 }
@@ -68,30 +60,10 @@ export function mapToReactFlow(backendData) {
     rawNodes = backendData.nodes;
     rawEdges = backendData.edges ?? [];
   } else if (backendData?.analiz_sonucu) {
-    // Mevcut backend fallback
-    const sonuc = backendData.analiz_sonucu;
-    rawNodes = [
-      {
-        id: 'info',
-        type: 'usecase',
-        label: `📄 ${sonuc.uml_kodu?.split('\n')[1] ?? 'Analiz tamamlandı'}`,
-      },
-      ...(sonuc.tespit_edilen_aktörler ?? []).map((a, i) => ({
-        id: `actor_${i}`,
-        type: 'actor',
-        label: `👤 ${a}`,
-      })),
-      ...(sonuc.tespit_edilen_aksiyonlar ?? []).map((ak, i) => ({
-        id: `action_${i}`,
-        type: 'usecase',
-        label: ak,
-      })),
-    ];
-    rawEdges = (sonuc.tespit_edilen_aktörler ?? []).map((_, i) => ({
-      id: `e_${i}`,
-      source: `actor_${i}`,
-      target: `action_${i}`,
-    }));
+    // Backend eski stub formatı döndürüyor — AI servisi henüz entegre edilmemiş
+    throw new Error(
+      'Backend henüz AI servisine bağlı değil. Lütfen backend ekibiyle iletişime geçin.'
+    );
   }
 
   // ── Dönüştürme ───────────────────────────────────────────────────────────
