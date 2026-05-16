@@ -4,6 +4,7 @@
 // Node seçilince üzerinde NodeToolbar (silme butonu) belirir.
 
 import { useReactFlow, Handle, Position, NodeToolbar } from 'reactflow';
+import { useSnapshot } from '../FlowCanvas';
 
 const inputStyle = {
   width: '100%',
@@ -16,14 +17,17 @@ const inputStyle = {
 
 export default function ClassNode({ id, data, selected }) {
   const { setNodes } = useReactFlow();
+  const takeSnapshot = useSnapshot();
 
   const update = (patch) =>
     setNodes((nds) =>
       nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...patch } } : n))
     );
 
-  const deleteNode = () =>
+  const deleteNode = () => {
+    takeSnapshot?.();
     setNodes((nds) => nds.filter((n) => n.id !== id));
+  };
 
   const updateItem = (field, index, value) => {
     const list = [...data[field]];
@@ -65,7 +69,7 @@ export default function ClassNode({ id, data, selected }) {
         {/* Özellikler */}
         <div className="class-node__section">
           {data.attributes?.map((attr, i) => (
-            <div key={i} className="class-node__row">
+            <div key={`attr-${i}`} className="class-node__row">
               <input
                 className="nodrag"
                 value={attr}
@@ -85,7 +89,7 @@ export default function ClassNode({ id, data, selected }) {
         {/* Metotlar */}
         <div className="class-node__section">
           {data.methods?.map((method, i) => (
-            <div key={i} className="class-node__row">
+            <div key={`method-${i}`} className="class-node__row">
               <input
                 className="nodrag"
                 value={method}

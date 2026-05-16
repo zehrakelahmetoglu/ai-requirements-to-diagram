@@ -4,17 +4,21 @@
 // Node seçilince NodeToolbar ile silme butonu belirir.
 
 import { useReactFlow, Handle, Position, NodeToolbar } from 'reactflow';
+import { useSnapshot } from '../FlowCanvas';
 
 export default function UseCaseNode({ id, data, selected }) {
   const { setNodes } = useReactFlow();
+  const takeSnapshot = useSnapshot();
 
   const updateLabel = (value) =>
     setNodes((nds) =>
       nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, label: value } } : n))
     );
 
-  const deleteNode = () =>
+  const deleteNode = () => {
+    takeSnapshot?.();
     setNodes((nds) => nds.filter((n) => n.id !== id));
+  };
 
   const isActor = data.isActor || data.label?.includes('👤');
 
