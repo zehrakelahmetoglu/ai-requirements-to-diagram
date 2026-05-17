@@ -469,7 +469,15 @@ body {
   transition: background 0.2s, color 0.2s;
   white-space: nowrap;
 }
-.toolbar__btn:hover { background: var(--color-surface-2); color: var(--color-text); }
+.toolbar__btn:hover:not(:disabled) { background: var(--color-surface-2); color: var(--color-text); }
+.toolbar__btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.toolbar__separator {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+  align-self: center;
+}
 
 /* ══════════════════════════════════════════════
    CLASS NODE

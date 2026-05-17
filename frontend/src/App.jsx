@@ -31,11 +31,13 @@ export default function App() {
 
   // FlowCanvas'ın iç addNode fonksiyonuna erişmek için ref köprüsü
   const addNodeRef = useRef(null);
+  const toastTimerRef = useRef(null);
 
   // Toast gösterme yardımcısı (3 sn sonra otomatik kaybolur)
   const showToast = useCallback((type, message) => {
     setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 3000);
   }, []);
 
   // ── Analiz İsteği ───────────────────────────────────────────────────────────
