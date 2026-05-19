@@ -36,7 +36,7 @@ def get_random_examples_from_dataset(num_examples: int = 3) -> str:
         for _ in range(num_examples):
             file = random.choice(files)
             filepath = os.path.join(dataset_dir, file)
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
                 lines = [ln.strip() for ln in f if ln.strip() and len(ln.strip()) > 20]
             if lines:
                 examples.append(random.choice(lines))
@@ -64,21 +64,24 @@ def parse_ai_response(response) -> dict:
 
 
 def _call_gemini(client, prompt: str) -> dict:
-    """
-    Gemini modellerini sırayla dener (pro → flash).
-    Başarılı olunca parse edilmiş dict döndürür; hepsi başarısız olursa hata fırlatır.
-    """
-    for model_name in ("gemini-2.5-pro", "gemini-2.5-flash"):
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
-            )
-            return parse_ai_response(response)
-        except Exception as exc:
-            logger.warning("Model '%s' başarısız oldu: %s", model_name, exc)
-            continue
+    import time
+    for attempt in range(4):
+        for model_name in ( "gemini-2.5-flash",):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(response_mime_type="application/json"),
+                )
+                return parse_ai_response(response)
+            except Exception as exc:
+                err = str(exc)
+                if "429" in err or "RESOURCE_EXHAUSTED" in err:
+                    logger.warning("Rate limit hit in analyze! Waiting %d s...", 20*(attempt+1))
+                    time.sleep(20*(attempt+1))
+                    continue
+                logger.warning("Model '%s' başarısız oldu: %s", model_name, exc)
+                continue
 
     raise RuntimeError("Tüm Gemini modelleri başarısız oldu.")
 
