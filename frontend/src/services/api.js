@@ -10,7 +10,7 @@ const BASE_URL = import.meta.env.VITE_API_URL
 /**
  * Gereksinim metnini ve diyagram tipini backend'e gönderir.
  * @param {string} text        - Kullanıcı tarafından girilen gereksinim metni
- * @param {string} diagramType - 'class' | 'usecase' | 'activity' | 'sequence'
+ * @param {string} diagramType - 'class' | 'usecase'
  * @returns {Promise<object>}  - Backend'den dönen ham JSON yanıtı
  * @throws {Error}             - HTTP hatası veya ağ/CORS hatası durumunda fırlatılır
  */

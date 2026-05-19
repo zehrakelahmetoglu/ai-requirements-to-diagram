@@ -56,6 +56,7 @@ def parse_ai_response(response) -> dict:
     if not raw_text:
         raise ValueError("AI cevabı boş geldi.")
 
+
     # Markdown code fence temizliği
     cleaned = re.sub(r"^```json\s*|\s*```$", "", raw_text, flags=re.IGNORECASE).strip()
     cleaned = re.sub(r"^```\s*|\s*```$", "", cleaned).strip()
@@ -67,6 +68,31 @@ def _call_gemini(client, prompt: str) -> dict:
     import time
     for attempt in range(4):
         for model_name in ( "gemini-2.5-flash",):
+
+    try:
+        client = genai.Client(api_key=api_key)
+        
+        prompt = f"""
+        Sen uzman bir Scrum Master ve Gereksinim Analistisin. Sana verilen metni değerlendir.
+        
+        GELEN METİN: "{text}"
+        
+        Lütfen metni analiz et ve aşağıdaki JSON formatında kesin ve adil bir değerlendirme yap:
+        {{
+            "is_valid": true/false,
+            "type": "Epic" veya "User Story" veya "Geçersiz",
+            "quality_score": 1 ile 10 arası puan,
+            "feedback": "Kullanıcıya yapıcı geri bildirim (Eğer eksikse neyi eksik, Epic ise nasıl bölünmeli)"
+        }}
+        
+        Değerlendirme Kriterleri:
+        - Çok kısa, belirsiz veya anlamsız (örn: 'sisteme gir', 'buton yap', 'çalışsın') metinler için "is_valid": false yap ve puanı 4'ün altında ver.
+        - Sadece bir rolün aksiyonunu değil, sistem çapında büyük bir işi anlatıyorsa "Epic" olarak işaretle.
+        - "As a [role], I want to [action], so that [benefit]" yapısına benzeyen, net bir Aktör ve Aksiyon barındıran metinlere 8 ve üzeri yüksek puan ver.
+        """
+        
+       
+
             try:
                 response = client.models.generate_content(
                     model=model_name,

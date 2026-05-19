@@ -3,10 +3,8 @@
 // analiz butonu ve hata/loading durumları.
 
 const DIAGRAM_OPTIONS = [
-  { value: 'class',    label: '🗂️  Sınıf Diyagramı',    preview: '▭ Sınıf kutusu',     color: '#6366f1' },
-  { value: 'usecase',  label: '👤 Use Case Diyagramı',  preview: '⬭ Elips / aktör',    color: '#059669' },
-  { value: 'activity', label: '⚙️  Aktivite Diyagramı', preview: '▢ Eylem kutusu',     color: '#3b82f6' },
-  { value: 'sequence', label: '🔄 Sıralama Diyagramı',  preview: '⬜ Yaşam çizgisi',   color: '#16a34a' },
+  { value: 'class',   label: '🗂️  Sınıf Diyagramı',   preview: '▭ Sınıf kutusu',  color: '#6366f1', buttonLabel: 'Sınıf Diyagramı' },
+  { value: 'usecase', label: '👤 Use Case Diyagramı', preview: '⬭ Elips / aktör', color: '#059669', buttonLabel: 'Use Case Diyagramı' },
 ];
 
 export default function Sidebar({
@@ -112,7 +110,7 @@ export default function Sidebar({
         onClick={onAddNode}
         style={{ borderColor: selectedOption?.color }}
       >
-        + {selectedOption?.label?.split(' ').slice(1).join(' ')} Ekle
+        + {selectedOption?.buttonLabel} Ekle
       </button>
 
       {/* Klavye ipucu */}
